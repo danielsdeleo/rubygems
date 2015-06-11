@@ -701,8 +701,20 @@ class Gem::Specification < Gem::BasicSpecification
   attr_accessor :specification_version
 
   def self._all # :nodoc:
+    original_value_of_at_at_all =
+      if !defined?(@@all)
+        :undefined
+      elsif @@all.nil?
+        :nil
+      else
+        :populated
+      end
+
+    unmapped_stubs = nil
+
     unless defined?(@@all) && @@all then
-      @@all = stubs.map(&:to_spec)
+      unmapped_stubs = stubs
+      @@all = unmapped_stubs.map(&:to_spec)
 
       # After a reset, make sure already loaded specs
       # are still marked as activated.
@@ -713,6 +725,17 @@ class Gem::Specification < Gem::BasicSpecification
       _resort!(@@all)
     end
     @@all
+  rescue NoMethodError => e
+    warn "Error in Gem::Specification._all"
+    warn e.to_s
+    warn "Value of @@all at start of call: #{original_value_of_at_at_all}"
+    warn "* * * * * * * *"
+    warn "Value of @@all: #{@@all.inspect}"
+    warn "* * * * * * * *"
+    warn "Value of unmapped stubs: #{unmapped_stubs.inspect}"
+    warn "* * * * * * * *"
+
+    raise e
   end
 
   def self._clear_load_cache # :nodoc:
