@@ -1049,9 +1049,18 @@ class Gem::Specification < Gem::BasicSpecification
   # Loads Ruby format gemspec from +file+.
 
   def self.load file
-    return unless file
+    unless file
+      warn "Gem::Specification called with bogus arg: #{file}"
+      return
+    end
+
     file = file.dup.untaint
-    return unless File.file?(file)
+
+    unless File.file?(file)
+      warn "Gem::Specification called with invalid arg (File.file? returned false) #{file}"
+      return
+    end
+
 
     spec = LOAD_CACHE[file]
     return spec if spec

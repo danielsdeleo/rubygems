@@ -161,6 +161,9 @@ class Gem::StubSpecification < Gem::BasicSpecification
     @spec ||= Gem::Specification.load(loaded_from)
     @spec.ignored = @ignored if instance_variable_defined? :@ignored
 
+    if @spec.nil?
+      warn "Stub spec #{self.inspect} returned nil attempting to load #{loaded_from}"
+    end
     @spec
   end
 
